@@ -1,5 +1,7 @@
 package scenes;
 
+import aeons.graphics.Color;
+import aeons.components.CNineSlice;
 import systems.BlockCreationSystem;
 import systems.BlockFallSystem;
 import aeons.math.Vector2;
@@ -24,21 +26,18 @@ class GameScene extends Scene {
   public override function init() {
     addSystem(new UpdateSystem());
     addSystem(new SimplePhysicsSystem({
-      worldY: -Aeons.display.viewHeight * 49,
+      worldY: -Aeons.display.viewHeight * 1.5,
       worldWidth: Aeons.display.viewWidth,
-      worldHeight: Aeons.display.viewHeight * 50
+      worldHeight: Aeons.display.viewHeight * 3
     }));
     addSystem(new BlockCreationSystem());
     addSystem(new BlockFallSystem());
 
     addSystem(new RenderSystem());
-    addSystem(new DebugRenderSystem());
-
+    // addSystem(new DebugRenderSystem());
 
     createCamera();
-
     createFloor();
-    createWalls();
   }
 
   function createCamera() {
@@ -51,7 +50,7 @@ class GameScene extends Scene {
     final entity = addEntity(new Entity());
     entity.addComponent(new CTransform({
       x: Aeons.display.viewCenterX,
-      y: Aeons.display.viewHeight
+      y: Aeons.display.viewHeight - 10
     }));
 
     entity.addComponent(new CSimpleBody({
@@ -60,31 +59,17 @@ class GameScene extends Scene {
       type: STATIC,
       tags: [Constants.STATIC_BLOCK_TAG]
     }));
-  }
 
-  function createWalls() {
-    final leftWall = addEntity(new Entity());
-    leftWall.addComponent(new CTransform({
-      x: 20,
-      y: Aeons.display.viewCenterY
-    }));
-
-    leftWall.addComponent(new CSimpleBody({
-      width: 40,
-      height: Aeons.display.viewHeight,
-      type: STATIC
-    }));
-
-    final rightWall = addEntity(new Entity());
-    rightWall.addComponent(new CTransform({
-      x: Aeons.display.viewWidth - 20,
-      y: Aeons.display.viewCenterY
-    }));
-
-    rightWall.addComponent(new CSimpleBody({
-      width: 40,
-      height: Aeons.display.viewHeight,
-      type: STATIC
+    var atlas = Aeons.assets.getAtlas('atlas');
+    entity.addComponent(new CNineSlice({
+      insetLeft: 4,
+      insetRight: 4,
+      insetTop: 4,
+      insetBottom: 4,
+      atlas: atlas,
+      frameName: '9slice',
+      width: Aeons.display.viewWidth - 80,
+      height: 20,
     }));
   }
 }

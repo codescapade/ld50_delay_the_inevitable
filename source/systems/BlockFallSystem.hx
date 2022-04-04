@@ -1,5 +1,7 @@
 package systems;
 
+import aeons.components.CNineSlice;
+import aeons.core.Entity;
 import aeons.tween.easing.Easing;
 import aeons.Aeons;
 import aeons.components.CCamera;
@@ -31,6 +33,9 @@ class BlockFallSystem extends System implements Updatable {
 
   var fallingHitTags = [Constants.FALLING_BLOCK_TAG];
 
+  var leftWall: CTransform;
+  var rightWall: CTransform;
+
   public function new() {
     super();
   }
@@ -39,6 +44,38 @@ class BlockFallSystem extends System implements Updatable {
     super.init();
     physics = getSystem(SimplePhysicsSystem);
     blockCreateSys = getSystem(BlockCreationSystem);
+    createWalls();
+  }
+
+  public function createWalls() {
+    var atlas = Aeons.assets.getAtlas('atlas');
+    var eLeft = Aeons.entities.addEntity(new Entity());
+    leftWall = eLeft.addComponent(new CTransform({ x: 20, y: Aeons.display.viewCenterY }));
+    eLeft.addComponent(new CSimpleBody({ width: 40, height: Aeons.display.viewHeight * 2, type: STATIC }));
+    eLeft.addComponent(new CNineSlice({
+      insetLeft: 4,
+      insetRight: 4,
+      insetTop: 4,
+      insetBottom: 4,
+      atlas: atlas,
+      frameName: '9slice',
+      width: 40,
+      height: Aeons.display.viewHeight * 2
+    }));
+
+    var eRight = Aeons.entities.addEntity(new Entity());
+    rightWall = eRight.addComponent(new CTransform({ x: Aeons.display.viewWidth - 20, y: Aeons.display.viewCenterY }));
+    eRight.addComponent(new CSimpleBody({ width: 40, height: Aeons.display.viewHeight * 2, type: STATIC }));
+    eRight.addComponent(new CNineSlice({
+      insetLeft: 4,
+      insetRight: 4,
+      insetTop: 4,
+      insetBottom: 4,
+      atlas: atlas,
+      frameName: '9slice',
+      width: 40,
+      height: Aeons.display.viewHeight * 2
+    }));
   }
 
   public function update(dt: Float) {
@@ -60,16 +97,27 @@ class BlockFallSystem extends System implements Updatable {
           body.velocity.y = 0;
           body.type = STATIC;
           body.tags.push(Constants.STATIC_BLOCK_TAG);
+          body.tags.remove(Constants.FALLING_BLOCK_TAG);
           var hit = hits.first();
           var dist = tempEnd.y - tempStart.y - hit.distance;
           var newPos = Vector2.get(x, y - dist);
           bundle.c_transform.setWorldPosition(newPos);
           blockCreateSys.updateYSpawn(newPos.y);
+          for (b in bundle.c_falling_block.extraBodies) {
+            b.getComponent(CTransform).setWorldPosition(newPos);
+            b.velocity.y = 0;
+            b.type = STATIC;
+            b.tags.push(Constants.STATIC_BLOCK_TAG);
+            b.tags.remove(Constants.FALLING_BLOCK_TAG);
+          }
 
           var cam = cameraBundles.get(0);
           if (cam.c_transform.y > newPos.y) {
             Aeons.tweens.removeAllFrom(cam.c_transform);
             Aeons.tweens.create(cam.c_transform, 1.0, { y: newPos.y }).setEase(Easing.easeOutCubic);
+            var change = newPos.y - leftWall.y;
+            leftWall.y = rightWall.y = newPos.y;
+            physics.worldY += change;
           }
         } else {
           hits = physics.raycast(tempStart, tempEnd, fallingHitTags);
@@ -80,6 +128,10 @@ class BlockFallSystem extends System implements Updatable {
                 var dist = tempEnd.y - tempStart.y - hit.distance;
                 var newPos = Vector2.get(x, y - dist);
                 bundle.c_transform.setWorldPosition(newPos);
+                for (b in bundle.c_falling_block.extraBodies) {
+                  b.getComponent(CTransform).setWorldPosition(newPos);
+                  b.velocity.y = hit.body.velocity.y;
+                }
               }
             }
           }

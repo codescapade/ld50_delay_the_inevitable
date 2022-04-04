@@ -1,0 +1,67 @@
+{
+  "frames": [
+    {
+      "rotated": false,
+      "spriteSourceSize": {
+        "h": 36,
+        "w": 36,
+        "x": 0,
+        "y": 0
+      },
+      "frame": {
+        "h": 36,
+        "w": 36,
+        "x": 1,
+        "y": 1
+      },
+      "trimmed": true,
+      "sourceSize": {
+        "h": 36,
+        "w": 36
+      },
+      "filename": "block"
+    },
+    {
+      "rotated": false,
+      "spriteSourceSize": {
+        "h": 20,
+        "w": 16,
+        "x": 0,
+        "y": 0
+      },
+      "frame": {
+        "h": 20,
+        "w": 16,
+        "x": 39,
+        "y": 1
+      },
+      "trimmed": true,
+      "sourceSize": {
+        "h": 20,
+        "w": 16
+      },
+      "filename": "player"
+    },
+    {
+      "rotated": false,
+      "spriteSourceSize": {
+        "h": 10,
+        "w": 10,
+        "x": 0,
+        "y": 0
+      },
+      "frame": {
+        "h": 10,
+        "w": 10,
+        "x": 39,
+        "y": 23
+      },
+      "trimmed": true,
+      "sourceSize": {
+        "h": 10,
+        "w": 10
+      },
+      "filename": "9slice"
+    }
+  ]
+}
